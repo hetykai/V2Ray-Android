@@ -2,6 +2,6 @@
     <string name="app_name">V2Ray</string>
     <string name="master_switch">Master switch</string>
     <string name="notification_content_title">V2Ray Is Running</string>
-    <string name="notification_content_text">Freedom shall be portable.</string>
+    <string name="notification_content_text">You will get access to a compelete internet with freedom.</string>
     <string name="notification_action_stop_v2ray">Stop V2Ray</string>
 </resources>

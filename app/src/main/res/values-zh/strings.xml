@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">V2Ray</string>
+    <string name="master_switch">主开关</string>
+    <string name="notification_action_stop_v2ray">停止V2Ray</string>
+    <string name="notification_content_text">你将访问到完整的、自由的互联网。</string>
+    <string name="notification_content_title">V2Ray正在运行</string>
+</resources>
