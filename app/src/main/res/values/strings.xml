@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">V2Ray</string>
-    <string name="master_switch">Master switch</string>
     <string name="notification_content_title">V2Ray Is Running</string>
     <string name="notification_content_text">You will get access to a compelete internet with freedom.</string>
     <string name="notification_action_stop_v2ray">Stop V2Ray</string>
@@ -12,7 +11,7 @@
     <string name="title_pref_user">User Settings</string>
     <string name="title_pref_user_email">Email</string>
     <string name="title_pref_stream">Stream Settings</string>
-    <string name="pref_stream_network_entries_tcp">TCP</string>
-    <string name="pref_stream_network_entries_kcp">KCP</string>
+    <string name="pref_stream_network_entries_tcp" translatable="false">TCP</string>
+    <string name="pref_stream_network_entries_kcp" translatable="false">KCP</string>
     <string name="title_pref_stream_network">Network</string>
 </resources>
