@@ -17,6 +17,7 @@ import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
+import com.rayfatasy.v2ray.service.V2RayVpnService
 import com.rayfatasy.v2ray.util.AssetsUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.ctx
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
         const val REQUEST_CODE_VPN_PREPARE = 0
     }
 
+    var isFabActive: Boolean = false
     val configFilePath: String by lazy { File(filesDir, "conf_vpnservice.json").absolutePath }
 
     private lateinit var vpnPrepareCallback: (Boolean) -> Unit
@@ -53,14 +55,36 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
                 }
                 .registerInBus(this)
         fabProgressCircle.attachListener(this)
+
+
+
         fab.setOnClickListener {
-            fabProgressCircle.show()
-            toast("连接中")
+            fab.show()
+            fab.isClickable = false
+
+            if (isFabActive == false) {
+                V2RayService.startV2Ray(ctx)
+                    isFabActive = true
+                    fabProgressCircle.beginFinalAnimation()
+            } else {
+                V2RayService.stopV2Ray()
+                    isFabActive = false
+                    fabProgressCircle.beginFinalAnimation()
+            }
+
         }
 
         //成功后使用下面设置动画
         //fabProgressCircle.beginFinalAnimation()
 
+    }
+
+    fun checkVPNStatus(): Boolean {
+        var isActive: Boolean = false
+        Bus.observe<V2RayStatusEvent>().subscribe {
+            isActive = it.isRunning
+        }
+        return isActive
     }
 
     override fun onDestroy() {
@@ -111,9 +135,11 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
             }
         }
     }
+
     override fun onFABProgressAnimationEnd() {
-        fabProgressCircle.beginFinalAnimation()
+        fab.isClickable = true
         toast("连接完成")
+
 
     }
 }
