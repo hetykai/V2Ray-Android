@@ -13,5 +13,5 @@
     <string name="title_pref_stream">Stream Settings</string>
     <string name="pref_stream_network_entries_tcp" translatable="false">TCP</string>
     <string name="pref_stream_network_entries_kcp" translatable="false">KCP</string>
-    <string name="title_pref_stream_network">Network</string>
+    <string name="title_pref_stream_network">Network protocol</string>
 </resources>

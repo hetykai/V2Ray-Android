@@ -4,4 +4,13 @@
     <string name="notification_action_stop_v2ray">停止V2Ray</string>
     <string name="notification_content_text">你将访问到完整的、自由的互联网。</string>
     <string name="notification_content_title">V2Ray正在运行</string>
+    <string name="title_pref_server">服务器选项</string>
+    <string name="title_pref_server_address">服务器地址</string>
+    <string name="title_pref_server_port">服务器端口</string>
+    <string name="title_pref_user">用户设置</string>
+    <string name="title_pref_stream">流选项</string>
+    <string name="title_pref_stream_network">网络协议</string>
+    <string name="title_pref_user_email">电子邮箱</string>
+    <string name="title_pref_user_id">ID</string>
+    <string name="title_pref_user_alter_id">Alter ID</string>
 </resources>
