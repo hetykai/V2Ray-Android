@@ -2,10 +2,12 @@ package com.rayfatasy.v2ray.util;
 
 import android.content.res.AssetManager;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public class AssetsUtil {
@@ -50,6 +52,22 @@ public class AssetsUtil {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static String readTextFromAssets(AssetManager assetManager, String fileName) {
+        try {
+            InputStreamReader inputReader = new InputStreamReader(assetManager.open(fileName));
+            BufferedReader bufReader = new BufferedReader(inputReader);
+            String line;
+            String Result = "";
+            while ((line = bufReader.readLine()) != null)
+                Result += line;
+            return Result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private static void copyFile(InputStream in, OutputStream out) throws IOException {

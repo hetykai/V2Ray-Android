@@ -14,12 +14,18 @@ import android.os.StrictMode
 import android.preference.PreferenceManager
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
+import com.google.gson.Gson
 import com.orhanobut.logger.Logger
+import com.rayfatasy.v2ray.R
+import com.rayfatasy.v2ray.dto.V2RayConfigOutbound
 import com.rayfatasy.v2ray.event.*
+import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.ui.MainActivity
+import com.rayfatasy.v2ray.util.AssetsUtil
 import go.libv2ray.Libv2ray
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.startService
+import java.io.File
 
 class V2RayService : Service() {
     companion object {
@@ -28,7 +34,11 @@ class V2RayService : Service() {
         const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 0
         const val ACTION_STOP_V2RAY = "com.rayfatasy.v2ray.action.STOP_V2RAY"
 
-        fun startV2Ray(context: Context) {
+        fun startV2Ray(context: Context, v2RayConfigOutbound: V2RayConfigOutbound) {
+            val templateStr = AssetsUtil.readTextFromAssets(context.assets, "conf_template.txt")
+            val gson = Gson()
+            val ret = templateStr.replace("<outbound>", gson.toJson(v2RayConfigOutbound))
+            File(context.getV2RayApplication().configFilePath).writeText(ret)
             context.startService<V2RayService>()
         }
 
@@ -132,8 +142,7 @@ class V2RayService : Service() {
         if (!v2rayPoint.isRunning) {
             v2rayPoint.callbacks = v2rayCallback
             v2rayPoint.vpnSupportSet = v2rayCallback
-            val configureFile = preference.getString(MainActivity.PREF_CONFIG_FILE_PATH, "")
-            v2rayPoint.configureFile = configureFile
+            v2rayPoint.configureFile = getV2RayApplication().configFilePath
             v2rayPoint.RunLoop()
         }
     }

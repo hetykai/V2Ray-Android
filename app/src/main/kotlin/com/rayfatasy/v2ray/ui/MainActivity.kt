@@ -5,46 +5,35 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceFragment
-import android.preference.PreferenceManager
 import android.preference.SwitchPreference
 import android.support.v7.app.AppCompatActivity
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.github.jorgecastilloprz.listeners.FABProgressListener
-import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.R
+import com.rayfatasy.v2ray.dto.V2RayConfigOutbound
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
-import com.rayfatasy.v2ray.util.AssetsUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.toast
-import java.io.File
 
 class MainActivity : AppCompatActivity(), FABProgressListener {
 
 
     companion object {
         const val PREF_MASTER_SWITCH = "pref_master_switch"
-        const val PREF_CONFIG_FILE_PATH = "pref_config_file_path"
         const val REQUEST_CODE_VPN_PREPARE = 0
     }
 
     var isFabActive: Boolean = false
-    val configFilePath: String by lazy { File(filesDir, "conf_vpnservice.json").absolutePath }
 
     private lateinit var vpnPrepareCallback: (Boolean) -> Unit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // TODO: Implement config file generation
-        AssetsUtil.copyAsset(assets, "conf_vpnservice.json", configFilePath)
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putString(PREF_CONFIG_FILE_PATH,
-                configFilePath).apply()
-        Logger.d(configFilePath)
 
         Bus.observe<VpnPrepareEvent>()
                 .subscribe {
@@ -61,7 +50,7 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
             fab.isClickable = false
 
             if (isFabActive == false) {
-                V2RayService.startV2Ray(ctx)
+                V2RayService.startV2Ray(ctx, V2RayConfigOutbound())
                 isFabActive = true
                 fabProgressCircle.beginFinalAnimation()
             } else {
@@ -127,7 +116,7 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
         override fun onSharedPreferenceChanged(pref: SharedPreferences?, key: String?) {
             when (key) {
                 PREF_MASTER_SWITCH -> if (preference.getBoolean(key, false))
-                    V2RayService.startV2Ray(ctx)
+                    V2RayService.startV2Ray(ctx, V2RayConfigOutbound())
                 else
                     V2RayService.stopV2Ray()
             }

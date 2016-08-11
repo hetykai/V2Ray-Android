@@ -48,9 +48,7 @@ dependencies {
 
     compile 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
 
-
-    // Velocity template engine
-    // compile 'org.apache.velocity:velocity:1.7'
+    compile 'com.google.code.gson:gson:2.7'
 }
 
 buildscript {
