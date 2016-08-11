@@ -15,6 +15,7 @@ import android.preference.PreferenceManager
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
+import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.*
 import com.rayfatasy.v2ray.ui.MainActivity
 import go.libv2ray.Libv2ray
