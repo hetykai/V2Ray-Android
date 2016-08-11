@@ -12,6 +12,7 @@ import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.github.jorgecastilloprz.listeners.FABProgressListener
 import com.orhanobut.logger.Logger
+import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
