@@ -15,7 +15,6 @@ import android.preference.PreferenceManager
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
-import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.*
 import com.rayfatasy.v2ray.ui.MainActivity
 import go.libv2ray.Libv2ray
@@ -37,8 +36,8 @@ class V2RayService : Service() {
             Bus.send(StopV2RayEvent)
         }
 
-        fun sendCheckStatusEvent() {
-            Bus.send(CheckV2RayStatusEvent)
+        fun checkStatusEvent(callback: (Boolean) -> Unit) {
+            Bus.send(CheckV2RayStatusEvent(callback))
         }
     }
 
@@ -86,7 +85,7 @@ class V2RayService : Service() {
                 .subscribe {
                     val prepare = VpnService.prepare(this)
                     val isRunning = prepare == null && vpnService != null && v2rayPoint.isRunning
-                    Bus.send(V2RayStatusEvent(isRunning))
+                    it.callback(isRunning)
                 }
 
         registerReceiver(stopV2RayReceiver, IntentFilter(ACTION_STOP_V2RAY))

@@ -7,17 +7,14 @@ import android.os.Bundle
 import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
 import android.preference.SwitchPreference
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.github.jorgecastilloprz.listeners.FABProgressListener
 import com.orhanobut.logger.Logger
-import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
-import com.rayfatasy.v2ray.service.V2RayVpnService
 import com.rayfatasy.v2ray.util.AssetsUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.ctx
@@ -64,12 +61,12 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
 
             if (isFabActive == false) {
                 V2RayService.startV2Ray(ctx)
-                    isFabActive = true
-                    fabProgressCircle.beginFinalAnimation()
+                isFabActive = true
+                fabProgressCircle.beginFinalAnimation()
             } else {
                 V2RayService.stopV2Ray()
-                    isFabActive = false
-                    fabProgressCircle.beginFinalAnimation()
+                isFabActive = false
+                fabProgressCircle.beginFinalAnimation()
             }
 
         }
@@ -107,8 +104,8 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            preference.edit().putBoolean(PREF_MASTER_SWITCH, false)
             addPreferencesFromResource(R.xml.pref_main)
+            masterSwitch.isChecked = false
         }
 
         override fun onResume() {
@@ -116,7 +113,7 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
             Bus.observe<V2RayStatusEvent>()
                     .subscribe { masterSwitch.isChecked = it.isRunning }
                     .registerInBus(this)
-            V2RayService.sendCheckStatusEvent()
+            V2RayService.checkStatusEvent { masterSwitch.isChecked = it }
             preference.registerOnSharedPreferenceChangeListener(this)
         }
 

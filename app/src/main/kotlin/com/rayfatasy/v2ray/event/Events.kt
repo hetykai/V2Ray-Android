@@ -5,7 +5,7 @@ import com.rayfatasy.v2ray.service.V2RayVpnService
 
 object StopV2RayEvent
 
-object CheckV2RayStatusEvent
+data class CheckV2RayStatusEvent(val callback: (Boolean) -> Unit)
 
 data class V2RayStatusEvent(val isRunning: Boolean)
 
