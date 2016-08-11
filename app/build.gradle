@@ -46,6 +46,9 @@ dependencies {
 
     compile 'com.orhanobut:logger:1.15'
 
+    compile 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
+
+
     // Velocity template engine
     // compile 'org.apache.velocity:velocity:1.7'
 }

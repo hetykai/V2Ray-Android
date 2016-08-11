@@ -7,19 +7,25 @@ import android.os.Bundle
 import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
 import android.preference.SwitchPreference
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
+import com.github.jorgecastilloprz.listeners.FABProgressListener
 import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
 import com.rayfatasy.v2ray.util.AssetsUtil
+import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.ctx
+import org.jetbrains.anko.toast
 import java.io.File
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FABProgressListener {
+
+
     companion object {
         const val PREF_MASTER_SWITCH = "pref_master_switch"
         const val PREF_CONFIG_FILE_PATH = "pref_config_file_path"
@@ -46,6 +52,15 @@ class MainActivity : AppCompatActivity() {
                     startActivityForResult(it.intent, REQUEST_CODE_VPN_PREPARE)
                 }
                 .registerInBus(this)
+        fabProgressCircle.attachListener(this)
+        fab.setOnClickListener {
+            fabProgressCircle.show()
+            toast("连接中")
+        }
+
+        //成功后使用下面设置动画
+        //fabProgressCircle.beginFinalAnimation()
+
     }
 
     override fun onDestroy() {
@@ -95,5 +110,10 @@ class MainActivity : AppCompatActivity() {
                     V2RayService.stopV2Ray()
             }
         }
+    }
+    override fun onFABProgressAnimationEnd() {
+        fabProgressCircle.beginFinalAnimation()
+        toast("连接完成")
+
     }
 }
