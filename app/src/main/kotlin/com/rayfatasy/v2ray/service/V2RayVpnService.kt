@@ -5,7 +5,8 @@ import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.eightbitlab.rxbus.Bus
-import com.rayfatasy.v2ray.event.VpnServiceEvent
+import com.rayfatasy.v2ray.event.StopV2RayEvent
+import com.rayfatasy.v2ray.event.VpnServiceStartEvent
 
 class V2RayVpnService : VpnService() {
 
@@ -13,12 +14,12 @@ class V2RayVpnService : VpnService() {
     fun getFd(): Int = mInterface.fd
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Bus.send(VpnServiceEvent(true, this))
+        Bus.send(VpnServiceStartEvent(this))
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onRevoke() {
-        Bus.send(VpnServiceEvent(false))
+        Bus.send(StopV2RayEvent)
         super.onRevoke()
     }
 

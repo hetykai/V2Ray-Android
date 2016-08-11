@@ -12,7 +12,7 @@ import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.event.StopV2RayEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
-import com.rayfatasy.v2ray.event.VpnServiceEvent
+import com.rayfatasy.v2ray.event.VpnServiceStartEvent
 import com.rayfatasy.v2ray.ui.MainActivity
 import go.libv2ray.Libv2ray
 import org.jetbrains.anko.startService
@@ -45,20 +45,16 @@ class V2RayService : Service() {
 
         v2rayPoint.packageName = packageName
 
-        Bus.observe<VpnServiceEvent>()
+        Bus.observe<VpnServiceStartEvent>()
                 .subscribe {
-                    Logger.d(it)
-                    if (it.start) {
-                        vpnService = it.vpnService
-                        vpnCheckIsReady()
-                    } else {
-                        vpnService = null
-                    }
+                    vpnService = it.vpnService
+                    vpnCheckIsReady()
                 }
                 .registerInBus(this)
 
         Bus.observe<StopV2RayEvent>()
                 .subscribe {
+                    vpnService = null
                     stopV2Ray()
                     stopSelf()
                 }
