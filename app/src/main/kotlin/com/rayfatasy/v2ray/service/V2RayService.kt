@@ -36,9 +36,10 @@ class V2RayService : Service() {
 
         Bus.observe<VpnServiceEvent>()
                 .subscribe {
+                    Logger.d(it)
                     if (it.start) {
                         vpnService = it.vpnService
-                        val prepare = VpnService.prepare(this)
+                        vpnCheckIsReady()
                     } else {
                         vpnService = null
                     }
@@ -65,29 +66,29 @@ class V2RayService : Service() {
 
     private fun vpnPrepare(): Int {
         startService<V2RayVpnService>()
-        val prepare = VpnService.prepare(this)
-        if (prepare == null) {
-            vpnCheckIsReady()
-            return 0
-        }
-        Bus.send(VpnPrepareEvent(prepare) {
-            if (it)
-                vpnCheckIsReady()
-            else
-                v2rayPoint.StopLoop()
-        })
         return 1
     }
 
-    private fun vpnCheckIsReady(): Int {
+    private fun vpnCheckIsReady() {
         val prepare = VpnService.prepare(this)
-        if (prepare == null && this.vpnService != null) {
+
+        if (prepare != null) {
+            Bus.send(VpnPrepareEvent(prepare) {
+                if (it)
+                    vpnCheckIsReady()
+                else
+                    v2rayPoint.StopLoop()
+            })
+            return
+        }
+
+        if (this.vpnService != null) {
             v2rayPoint.VpnSupportReady()
         }
-        return 0
     }
 
     private fun startV2ray() {
+        Logger.d(v2rayPoint)
         if (!v2rayPoint.isRunning) {
             // show_noti("Freedom shall be portable.")
             v2rayPoint.callbacks = v2rayCallback
@@ -108,7 +109,7 @@ class V2RayService : Service() {
     private inner class V2RayCallback : Libv2ray.V2RayCallbacks, Libv2ray.V2RayVPNServiceSupportsSet {
         override fun Shutdown() = 0L
 
-        override fun GetVPNFd() = vpnService!!.getfd().toLong()
+        override fun GetVPNFd() = vpnService!!.getFd().toLong()
 
         override fun Prepare() = vpnPrepare().toLong()
 

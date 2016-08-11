@@ -10,7 +10,7 @@ import com.rayfatasy.v2ray.event.VpnServiceEvent
 class V2RayVpnService : VpnService() {
 
     private lateinit var mInterface: ParcelFileDescriptor
-    fun getfd(): Int = mInterface.fd
+    fun getFd(): Int = mInterface.fd
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Bus.send(VpnServiceEvent(true, this))
