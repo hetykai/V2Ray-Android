@@ -6,11 +6,13 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
+import android.preference.SwitchPreference
 import android.support.v7.app.AppCompatActivity
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.R
+import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
 import com.rayfatasy.v2ray.util.AssetsUtil
@@ -62,18 +64,26 @@ class MainActivity : AppCompatActivity() {
     class MainFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
         private val preference by lazy { preferenceManager.sharedPreferences }
 
+        val masterSwitch by lazy { findPreference(PREF_MASTER_SWITCH) as SwitchPreference }
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
+            preference.edit().putBoolean(PREF_MASTER_SWITCH, false)
             addPreferencesFromResource(R.xml.pref_main)
         }
 
         override fun onResume() {
             super.onResume()
+            Bus.observe<V2RayStatusEvent>()
+                    .subscribe { masterSwitch.isChecked = it.isRunning }
+                    .registerInBus(this)
+            V2RayService.sendCheckStatusEvent()
             preference.registerOnSharedPreferenceChangeListener(this)
         }
 
         override fun onPause() {
             super.onPause()
+            Bus.unregister(this)
             preference.unregisterOnSharedPreferenceChangeListener(this)
         }
 

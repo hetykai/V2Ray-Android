@@ -5,21 +5,35 @@ import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.eightbitlab.rxbus.Bus
+import com.eightbitlab.rxbus.registerInBus
 import com.rayfatasy.v2ray.event.StopV2RayEvent
-import com.rayfatasy.v2ray.event.VpnServiceStartEvent
+import com.rayfatasy.v2ray.event.VpnServiceSendSelfEvent
+import com.rayfatasy.v2ray.event.VpnServiceStatusEvent
 
 class V2RayVpnService : VpnService() {
 
     private lateinit var mInterface: ParcelFileDescriptor
     fun getFd(): Int = mInterface.fd
 
+    override fun onCreate() {
+        super.onCreate()
+        Bus.observe<StopV2RayEvent>()
+                .subscribe { stopSelf() }
+                .registerInBus(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Bus.unregister(this)
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Bus.send(VpnServiceStartEvent(this))
+        Bus.send(VpnServiceSendSelfEvent(this))
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onRevoke() {
-        Bus.send(StopV2RayEvent)
+        Bus.send(VpnServiceStatusEvent(false))
         super.onRevoke()
     }
 
@@ -50,6 +64,7 @@ class V2RayVpnService : VpnService() {
 
         // Create a new interface using the builder and save the parameters.
         mInterface = builder.establish()
+        Bus.send(VpnServiceStatusEvent(true))
         Log.i("VPNService", "New interface: " + parameters)
     }
 }

@@ -10,9 +10,7 @@ import android.preference.PreferenceManager
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
-import com.rayfatasy.v2ray.event.StopV2RayEvent
-import com.rayfatasy.v2ray.event.VpnPrepareEvent
-import com.rayfatasy.v2ray.event.VpnServiceStartEvent
+import com.rayfatasy.v2ray.event.*
 import com.rayfatasy.v2ray.ui.MainActivity
 import go.libv2ray.Libv2ray
 import org.jetbrains.anko.startService
@@ -25,6 +23,10 @@ class V2RayService : Service() {
 
         fun stopV2Ray() {
             Bus.send(StopV2RayEvent)
+        }
+
+        fun sendCheckStatusEvent() {
+            Bus.send(CheckV2RayStatusEvent)
         }
     }
 
@@ -45,7 +47,7 @@ class V2RayService : Service() {
 
         v2rayPoint.packageName = packageName
 
-        Bus.observe<VpnServiceStartEvent>()
+        Bus.observe<VpnServiceSendSelfEvent>()
                 .subscribe {
                     vpnService = it.vpnService
                     vpnCheckIsReady()
@@ -54,11 +56,21 @@ class V2RayService : Service() {
 
         Bus.observe<StopV2RayEvent>()
                 .subscribe {
-                    vpnService = null
                     stopV2Ray()
-                    stopSelf()
                 }
                 .registerInBus(this)
+
+        Bus.observe<VpnServiceStatusEvent>()
+                .filter { !it.isRunning }
+                .subscribe { stopV2Ray() }
+                .registerInBus(this)
+
+        Bus.observe<CheckV2RayStatusEvent>()
+                .subscribe {
+                    val prepare = VpnService.prepare(this)
+                    val isRunning = prepare == null && vpnService != null && v2rayPoint.isRunning
+                    Bus.send(V2RayStatusEvent(isRunning))
+                }
     }
 
     override fun onDestroy() {
@@ -91,6 +103,7 @@ class V2RayService : Service() {
 
         if (this.vpnService != null) {
             v2rayPoint.VpnSupportReady()
+            Bus.send(V2RayStatusEvent(true))
         }
     }
 
@@ -111,6 +124,9 @@ class V2RayService : Service() {
         if (v2rayPoint.isRunning) {
             v2rayPoint.StopLoop()
         }
+        vpnService = null
+        Bus.send(V2RayStatusEvent(false))
+        stopSelf()
     }
 
     private inner class V2RayCallback : Libv2ray.V2RayCallbacks, Libv2ray.V2RayVPNServiceSupportsSet {
