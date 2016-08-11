@@ -51,6 +51,8 @@ class V2RayConfigOutbound {
                 var id: String = "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297"
                 @SerializedName("alterId")
                 var alterId: Int = 64
+                @SerializedName("email")
+                var email: String = ""
             }
         }
     }

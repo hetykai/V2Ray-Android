@@ -34,10 +34,11 @@ class V2RayService : Service() {
         const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 0
         const val ACTION_STOP_V2RAY = "com.rayfatasy.v2ray.action.STOP_V2RAY"
 
-        fun startV2Ray(context: Context, v2RayConfigOutbound: V2RayConfigOutbound) {
+        fun startV2Ray(context: Context) {
+            val config = generateV2RayConfigOutbound(context)
             val templateStr = AssetsUtil.readTextFromAssets(context.assets, "conf_template.txt")
             val gson = Gson()
-            val ret = templateStr.replace("<outbound>", gson.toJson(v2RayConfigOutbound))
+            val ret = templateStr.replace("<outbound>", gson.toJson(config))
             File(context.getV2RayApplication().configFilePath).writeText(ret)
             context.startService<V2RayService>()
         }
@@ -49,12 +50,31 @@ class V2RayService : Service() {
         fun checkStatusEvent(callback: (Boolean) -> Unit) {
             Bus.send(CheckV2RayStatusEvent(callback))
         }
+
+        fun generateV2RayConfigOutbound(ctx: Context): V2RayConfigOutbound {
+            val config = V2RayConfigOutbound()
+            val preference = PreferenceManager.getDefaultSharedPreferences(ctx)
+            val vnextBean = config.settings.vnext[0]
+            vnextBean.address = preference.getString(MainActivity.MainFragment.PREF_SERVER_ADDRESS,
+                    vnextBean.address)
+            vnextBean.port = preference.getString(MainActivity.MainFragment.PREF_SERVER_PORT,
+                    vnextBean.port.toString()).toInt()
+            val usersBean = vnextBean.users[0]
+            usersBean.id = preference.getString(MainActivity.MainFragment.PREF_USER_ID,
+                    usersBean.id)
+            usersBean.alterId = preference.getString(MainActivity.MainFragment.PREF_USER_ALTER_ID,
+                    usersBean.alterId.toString()).toInt()
+            usersBean.email = preference.getString(MainActivity.MainFragment.PREF_USER_EMAIL,
+                    usersBean.email)
+            config.streamSettings.network = preference.getString(MainActivity.MainFragment.PREF_STREAM_NETWORK,
+                    config.streamSettings.network)
+            return config
+        }
     }
 
     private val v2rayPoint = Libv2ray.NewV2RayPoint()
     private var vpnService: V2RayVpnService? = null
     private val v2rayCallback = V2RayCallback()
-    private val preference by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
     private val stopV2RayReceiver = object : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, intent: Intent?) {
             stopV2Ray()
