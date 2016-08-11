@@ -194,13 +194,15 @@ class V2RayService : Service() {
             val stopV2RayPendingIntent = PendingIntent.getBroadcast(applicationContext,
                     NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             notificationBuilder
-                    .addAction(R.drawable.ic_close_blue_grey_800_18dp,
+                    .addAction(R.drawable.ic_close_grey_800_24dp,
                             getString(R.string.notification_action_stop_v2ray),
                             stopV2RayPendingIntent)
                     .build()
         } else {
             notificationBuilder.notification
         }
+
+        notification.flags = notification.flags or Notification.FLAG_ONGOING_EVENT
 
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
