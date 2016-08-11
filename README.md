@@ -1,5 +1,6 @@
-[![GitHub version](https://badge.fury.io/gh/RayFantasyStudio%2FV2Ray-Android.svg)](https://badge.fury.io/gh/ztc1997%2FVibrationTuner) ![license](http://img.shields.io/badge/license-Apache2-brightgreen.svg) ![platform](http://img.shields.io/badge/platform-Android-blue.svg)
-# V2Ray-Android
+[![GitHub version](https://badge.fury.io/gh/RayFantasyStudio%2FV2Ray-Android.svg)](https://badge.fury.io/gh/RayFantasyStudio%2FV2Ray-Android) ![license](http://img.shields.io/badge/license-Apache2-brightgreen.svg) ![platform](http://img.shields.io/badge/platform-Android-blue.svg)
+# V2Ray For Android
+A V2Ray client for Android
 
 ## License
 ```
