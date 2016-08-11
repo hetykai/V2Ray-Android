@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="pref_stream_network_values">
+    <string-array name="pref_stream_network_values" translatable="false">
         <item>tcp</item>
         <item>kcp</item>
     </string-array>
