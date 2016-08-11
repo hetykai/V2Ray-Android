@@ -1,6 +1,7 @@
 package com.rayfatasy.v2ray.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.IBinder
@@ -17,6 +18,16 @@ import go.libv2ray.Libv2ray
 import org.jetbrains.anko.startService
 
 class V2RayService : Service() {
+    companion object {
+        fun startV2Ray(context: Context) {
+            context.startService<V2RayService>()
+        }
+
+        fun stopV2Ray() {
+            Bus.send(StopV2RayEvent)
+        }
+    }
+
     private val v2rayPoint = Libv2ray.NewV2RayPoint()
     private var vpnService: V2RayVpnService? = null
     private val v2rayCallback = V2RayCallback()

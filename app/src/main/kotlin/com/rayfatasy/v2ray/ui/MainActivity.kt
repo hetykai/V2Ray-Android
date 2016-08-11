@@ -11,11 +11,10 @@ import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.R
-import com.rayfatasy.v2ray.event.StopV2RayEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
 import com.rayfatasy.v2ray.util.AssetsUtil
-import org.jetbrains.anko.startService
+import org.jetbrains.anko.ctx
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -81,9 +80,9 @@ class MainActivity : AppCompatActivity() {
         override fun onSharedPreferenceChanged(pref: SharedPreferences?, key: String?) {
             when (key) {
                 PREF_MASTER_SWITCH -> if (preference.getBoolean(key, false))
-                    startService<V2RayService>()
+                    V2RayService.startV2Ray(ctx)
                 else
-                    Bus.send(StopV2RayEvent)
+                    V2RayService.stopV2Ray()
             }
         }
     }
