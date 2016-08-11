@@ -3,6 +3,7 @@ package com.rayfatasy.v2ray.ui
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.preference.EditTextPreference
 import android.preference.ListPreference
@@ -17,6 +18,7 @@ import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.service.V2RayService
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.toast
 
@@ -42,36 +44,39 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
                 }
                 .registerInBus(this)
         fabProgressCircle.attachListener(this)
-
-
-
         fab.setOnClickListener {
-            fab.show()
-            fab.isClickable = false
-
-            if (isFabActive == false) {
+            if(!isServiceActive){
+                fabProgressCircle.show()
                 V2RayService.startV2Ray(ctx)
-                isFabActive = true
+                isServiceActive = true
                 fabProgressCircle.beginFinalAnimation()
-            } else {
+
+            }else{
+                fabProgressCircle.show()
                 V2RayService.stopV2Ray()
-                isFabActive = false
+                isServiceActive = false
+                fab.setImageResource(R.drawable.ic_action_logo)
                 fabProgressCircle.beginFinalAnimation()
             }
 
         }
 
-        //成功后使用下面设置动画
-        //fabProgressCircle.beginFinalAnimation()
 
     }
 
-    fun checkVPNStatus(): Boolean {
-        var isActive: Boolean = false
-        Bus.observe<V2RayStatusEvent>().subscribe {
-            isActive = it.isRunning
+    override fun onResume() {
+        super.onResume()
+        V2RayService.checkStatusEvent {
+            if(it){
+                fab.setBackgroundColor(Color.parseColor("#000000"))
+                fab.setImageResource(R.drawable.ic_check_24dp)
+                isServiceActive = true
+            }else{
+                fab.setImageResource(R.drawable.ic_action_logo)
+                isServiceActive = false
+            }
         }
-        return isActive
+
     }
 
     override fun onDestroy() {
@@ -168,7 +173,12 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
 
     override fun onFABProgressAnimationEnd() {
         fab.isClickable = true
-        toast("连接完成")
+        if(isServiceActive){
+            fab.setImageResource(R.drawable.ic_check_24dp)
+            toast("连接成功")
+        }else{
+            toast("已停止连接")
+        }
 
 
     }
