@@ -24,7 +24,7 @@ import org.jetbrains.anko.startService
 
 class V2RayService : Service() {
     companion object {
-        const val NOTIFYCATION_ID = 0
+        const val NOTIFICATION_ID = 0
         const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
         const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 0
         const val ACTION_STOP_V2RAY = "com.rayfatasy.v2ray.action.STOP_V2RAY"
@@ -174,11 +174,11 @@ class V2RayService : Service() {
             notificationBuilder.notification
         }
 
-        notificationManager.notify(NOTIFYCATION_ID, notification)
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
     private fun cancelNotification() {
-        notificationManager.cancel(NOTIFYCATION_ID)
+        notificationManager.cancel(NOTIFICATION_ID)
     }
 
     private inner class V2RayCallback : Libv2ray.V2RayCallbacks, Libv2ray.V2RayVPNServiceSupportsSet {
