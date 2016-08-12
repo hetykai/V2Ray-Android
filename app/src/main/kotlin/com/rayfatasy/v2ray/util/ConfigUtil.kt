@@ -4,16 +4,16 @@ import org.json.JSONException
 import org.json.JSONObject
 
 object ConfigUtil {
-    val portPair = "port" to 10808
-    val inboundPair = "inbound" to JSONObject("""{
+    val replacementPairs = listOf("port" to 10808,
+            "inbound" to JSONObject("""{
         "protocol": "socks",
         "listen": "127.0.0.1",
         "settings": {
             "auth": "noauth",
             "udp": true
         }
-    }""")
-    val lib2rayPair = "#lib2ray" to JSONObject("""{
+    }"""),
+            "#lib2ray" to JSONObject("""{
     "enabled": true,
     "listener": {
       "onUp": "#none",
@@ -45,7 +45,10 @@ object ConfigUtil {
       ],
       "VPNSetupArg": "m,1500 a,26.26.26.1,24 r,0.0.0.0,0 d,208.67.222.222"
     }
-  }""")
+  }"""),
+            "log" to JSONObject("""{
+    "loglevel": "warning"
+            }"""))
 
     fun validConfig(conf: String): Boolean {
         try {
@@ -56,15 +59,14 @@ object ConfigUtil {
         }
     }
 
-    fun isConfigCompatible(conf: String) = JSONObject(conf).has(lib2rayPair.first)
+    fun isConfigCompatible(conf: String) = JSONObject(conf).has("#lib2ray")
 
     fun convertConfig(conf: String): String {
         val jObj = JSONObject(conf)
-        jObj.putOpt(portPair)
-        jObj.putOpt(inboundPair)
-        jObj.putOpt(lib2rayPair)
+        jObj.putOpt(replacementPairs)
         return jObj.toString()
     }
 }
 
 fun JSONObject.putOpt(pair: Pair<String, Any>) = putOpt(pair.first, pair.second)!!
+fun JSONObject.putOpt(pairs: List<Pair<String, Any>>) = pairs.forEach { putOpt(it) }

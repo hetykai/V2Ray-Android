@@ -1,9 +1,7 @@
 {
   "port": 10808,
   "log": {
-    "access": "",
-    "error": "",
-    "loglevel": "info"
+    "loglevel": "warning"
   },
   "inbound": {
     "protocol": "socks",
