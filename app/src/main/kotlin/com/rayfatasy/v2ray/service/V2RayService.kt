@@ -11,21 +11,16 @@ import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
 import android.os.StrictMode
-import android.preference.PreferenceManager
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.R
-import com.rayfatasy.v2ray.dto.V2RayConfigOutbound
 import com.rayfatasy.v2ray.event.*
 import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.ui.MainActivity
-import com.rayfatasy.v2ray.util.AssetsUtil
 import go.libv2ray.Libv2ray
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.startService
-import java.io.File
 
 class V2RayService : Service() {
     companion object {
@@ -35,11 +30,6 @@ class V2RayService : Service() {
         const val ACTION_STOP_V2RAY = "com.rayfatasy.v2ray.action.STOP_V2RAY"
 
         fun startV2Ray(context: Context) {
-            val config = generateV2RayConfigOutbound(context)
-            val templateStr = AssetsUtil.readTextFromAssets(context.assets, "conf_template.txt")
-            val gson = Gson()
-            val ret = templateStr.replace("<outbound>", gson.toJson(config))
-            File(context.getV2RayApplication().configFilePath).writeText(ret)
             context.startService<V2RayService>()
         }
 
@@ -49,26 +39,6 @@ class V2RayService : Service() {
 
         fun checkStatusEvent(callback: (Boolean) -> Unit) {
             Bus.send(CheckV2RayStatusEvent(callback))
-        }
-
-        fun generateV2RayConfigOutbound(ctx: Context): V2RayConfigOutbound {
-            val config = V2RayConfigOutbound()
-            val preference = PreferenceManager.getDefaultSharedPreferences(ctx)
-            val vnextBean = config.settings.vnext[0]
-            vnextBean.address = preference.getString(MainActivity.MainFragment.PREF_SERVER_ADDRESS,
-                    vnextBean.address)
-            vnextBean.port = preference.getString(MainActivity.MainFragment.PREF_SERVER_PORT,
-                    vnextBean.port.toString()).toInt()
-            val usersBean = vnextBean.users[0]
-            usersBean.id = preference.getString(MainActivity.MainFragment.PREF_USER_ID,
-                    usersBean.id)
-            usersBean.alterId = preference.getString(MainActivity.MainFragment.PREF_USER_ALTER_ID,
-                    usersBean.alterId.toString()).toInt()
-            usersBean.email = preference.getString(MainActivity.MainFragment.PREF_USER_EMAIL,
-                    usersBean.email)
-            config.streamSettings.network = preference.getString(MainActivity.MainFragment.PREF_STREAM_NETWORK,
-                    config.streamSettings.network)
-            return config
         }
     }
 
@@ -162,7 +132,7 @@ class V2RayService : Service() {
         if (!v2rayPoint.isRunning) {
             v2rayPoint.callbacks = v2rayCallback
             v2rayPoint.vpnSupportSet = v2rayCallback
-            v2rayPoint.configureFile = getV2RayApplication().configFilePath
+            v2rayPoint.configureFile = getV2RayApplication().configFile.absolutePath
             v2rayPoint.RunLoop()
         }
     }

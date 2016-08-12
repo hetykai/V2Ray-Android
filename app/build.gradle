@@ -47,8 +47,6 @@ dependencies {
     compile 'com.orhanobut:logger:1.15'
 
     compile 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
-
-    compile 'com.google.code.gson:gson:2.7'
 }
 
 buildscript {

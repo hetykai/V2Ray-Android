@@ -13,37 +13,31 @@
       "udp": true
     }
   },
-  "inboundDetour": [
-    {
-      "protocol": "http",
-      "port": 10845,
-      "settings": {},
-      "listen": "127.0.0.1"
+  "inboundDetour": [],
+  "outbound": {
+    "protocol": "vmess",
+    "settings": {
+      "vnext": [
+        {
+          "address": "v2ray.cool",
+          "port": 10086,
+          "users": [
+            {
+              "id": "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297",
+              "alterId": 64
+            }
+          ]
+        }
+      ]
     },
-    {
-      "protocol": "dokodemo-door",
-      "listen": "127.0.0.1",
-      "port": 10846,
-      "settings": {
-        "network": "tcp",
-        "timeout": 0,
-        "followRedirect": true
-      }
-    },
-    {
-      "protocol": "dokodemo-door",
-      "listen": "127.0.0.1",
-      "port": 5353,
-      "settings": {
-        "network": "tcp",
-        "timeout": 120,
-        "address": "208.67.222.222",
-        "port": 53,
-        "followRedirect": false
+    "streamSettings": {
+      "network": "tcp",
+      "security": "none",
+      "tlsSettings": {
+        "allowInsecure": true
       }
     }
-  ],
-  "outbound": <outbound>,
+  },
   "outboundDetour": [
     {
       "protocol": "freedom",
@@ -54,32 +48,7 @@
   "routing": {
     "strategy": "rules",
     "settings": {
-      "domainStrategy": "IPIfNonMatch",
       "rules": [
-        {
-          "type": "field",
-          "port": "1-52",
-          "outboundTag": "direct"
-        },
-        {
-          "type": "field",
-          "port": "54-79",
-          "outboundTag": "direct"
-        },
-        {
-          "type": "field",
-          "port": "81-442",
-          "outboundTag": "direct"
-        },
-        {
-          "type": "field",
-          "port": "444-65535",
-          "outboundTag": "direct"
-        },
-        {
-          "type": "chinasites",
-          "outboundTag": "direct"
-        },
         {
           "type": "field",
           "ip": [
@@ -100,10 +69,6 @@
             "fe80::/10"
           ],
           "outboundTag": "direct"
-        },
-        {
-          "type": "chinaip",
-          "outboundTag": "direct"
         }
       ]
     }
@@ -116,8 +81,6 @@
       "onDown": "#none"
     },
     "env": [
-      "V2RayDNSPort=5353",
-      "DNSForwardingProxyPort=5350",
       "V2RaySocksPort=10808"
     ],
     "render": [],

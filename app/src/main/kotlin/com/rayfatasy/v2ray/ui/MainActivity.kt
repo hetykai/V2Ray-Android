@@ -2,20 +2,21 @@ package com.rayfatasy.v2ray.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.preference.EditTextPreference
-import android.preference.ListPreference
-import android.preference.PreferenceFragment
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.github.jorgecastilloprz.listeners.FABProgressListener
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
+import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.service.V2RayService
+import com.rayfatasy.v2ray.util.ConfigUtil
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.toast
 
@@ -23,7 +24,9 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
 
 
     companion object {
-        const val REQUEST_CODE_VPN_PREPARE = 0
+        private const val REQUEST_CODE_VPN_PREPARE = 0
+
+        private const val REQUEST_CODE_FILE_SELECT = 1
     }
 
     var isServiceActive: Boolean = false
@@ -58,7 +61,7 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
 
         }
 
-
+        tv_config_content.text = getV2RayApplication().configFile.readText()
     }
 
     override fun onResume() {
@@ -86,70 +89,61 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
         when (requestCode) {
             REQUEST_CODE_VPN_PREPARE ->
                 vpnPrepareCallback(resultCode == Activity.RESULT_OK)
+
+            REQUEST_CODE_FILE_SELECT -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val uri = data!!.data
+                    val rawInputStream = contentResolver.openInputStream(uri)
+                    val rawConfig = rawInputStream.bufferedReader().readText()
+                    val retFile = getV2RayApplication().configFile
+
+                    if (!ConfigUtil.validConfig(rawConfig)) {
+                        toast(R.string.toast_config_file_invalid)
+                        return
+                    }
+
+                    if (ConfigUtil.isConfigCompatible(rawConfig)) {
+                        retFile.writeText(rawConfig)
+                        tv_config_content.text = rawConfig
+                    } else {
+                        alert(R.string.msg_dialog_convert_config, R.string.title_dialog_convert_config) {
+                            positiveButton(android.R.string.ok) {
+                                val retConfig = ConfigUtil.convertConfig(rawConfig)
+                                retFile.writeText(retConfig)
+                                tv_config_content.text = retConfig
+                            }
+
+                            negativeButton()
+
+                            show()
+                        }
+                    }
+                }
+            }
         }
     }
 
-    class MainFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
 
-        companion object {
-            const val PREF_SERVER_ADDRESS = "pref_server_address"
-            const val PREF_SERVER_PORT = "pref_server_port"
-            const val PREF_USER_ID = "pref_user_id"
-            const val PREF_USER_ALTER_ID = "pref_user_alter_id"
-            const val PREF_USER_EMAIL = "pref_user_email"
-            const val PREF_STREAM_NETWORK = "pref_stream_network"
-        }
+    override fun onOptionsItemSelected(item: MenuItem?) = when (item!!.itemId) {
+        R.id.add_config -> {
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "*/*"
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
 
-        private val preference by lazy { preferenceManager.sharedPreferences }
-
-        val serverAddress by lazy { findPreference(PREF_SERVER_ADDRESS) as EditTextPreference }
-        val serverPort by lazy { findPreference(PREF_SERVER_PORT) as EditTextPreference }
-        val userId by lazy { findPreference(PREF_USER_ID) as EditTextPreference }
-        val userAlterId by lazy { findPreference(PREF_USER_ALTER_ID) as EditTextPreference }
-        val userEmail by lazy { findPreference(PREF_USER_EMAIL) as EditTextPreference }
-        val streamNetwork by lazy { findPreference(PREF_STREAM_NETWORK) as ListPreference }
-
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            addPreferencesFromResource(R.xml.pref_main)
-        }
-
-        override fun onResume() {
-            super.onResume()
-            serverAddress.summary = preference.getString(PREF_SERVER_ADDRESS, "v2ray.cool")
-            serverPort.summary = preference.getString(PREF_SERVER_PORT, "10086")
-            userId.summary = preference.getString(PREF_USER_ID, "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297")
-            userAlterId.summary = preference.getString(PREF_USER_ALTER_ID, "64")
-            userEmail.summary = preference.getString(PREF_USER_EMAIL, "")
-            streamNetwork.summary = streamNetwork.entry
-            preference.registerOnSharedPreferenceChangeListener(this)
-        }
-
-        override fun onPause() {
-            super.onPause()
-            preference.unregisterOnSharedPreferenceChangeListener(this)
-        }
-
-        override fun onSharedPreferenceChanged(pref: SharedPreferences?, key: String?) {
-            when (key) {
-                PREF_SERVER_ADDRESS -> serverAddress.summary = preference
-                        .getString(key, "v2ray.cool")
-
-                PREF_SERVER_PORT -> serverPort.summary = preference
-                        .getString(key, "10086")
-
-                PREF_USER_ID -> userId.summary = preference
-                        .getString(key, "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297")
-
-                PREF_USER_ALTER_ID -> userAlterId.summary = preference
-                        .getString(key, "64")
-
-                PREF_USER_EMAIL -> userEmail.summary = preference
-                        .getString(key, "")
-
-                PREF_STREAM_NETWORK -> streamNetwork.summary = streamNetwork.entry
+            try {
+                startActivityForResult(
+                        Intent.createChooser(intent, getString(R.string.title_file_chooser)),
+                        REQUEST_CODE_FILE_SELECT)
+            } catch (ex: android.content.ActivityNotFoundException) {
+                toast(R.string.toast_require_file_manager)
             }
+            true
         }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onFABProgressAnimationEnd() {

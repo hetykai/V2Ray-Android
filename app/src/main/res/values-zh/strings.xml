@@ -13,4 +13,10 @@
     <string name="title_pref_user_email">电子邮箱</string>
     <string name="title_pref_user_id">ID</string>
     <string name="title_pref_user_alter_id">Alter ID</string>
+    <string name="menu_item_add_config">添加配置</string>
+    <string name="msg_dialog_convert_config">改配置文件与Android版本的V2Ray不兼容，点击确定进行转化。</string>
+    <string name="title_dialog_convert_config">转化配置文件</string>
+    <string name="title_file_chooser">选择文件以导入</string>
+    <string name="toast_config_file_invalid">配置文件无效</string>
+    <string name="toast_require_file_manager">请安装一个文件管理器</string>
 </resources>

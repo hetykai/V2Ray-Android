@@ -14,4 +14,10 @@
     <string name="pref_stream_network_entries_tcp" translatable="false">TCP</string>
     <string name="pref_stream_network_entries_kcp" translatable="false">KCP</string>
     <string name="title_pref_stream_network">Network protocol</string>
+    <string name="menu_item_add_config">Add config</string>
+    <string name="title_file_chooser">Select a File to Import</string>
+    <string name="toast_require_file_manager">Please install a File Manager.</string>
+    <string name="title_dialog_convert_config">Convert Config File</string>
+    <string name="msg_dialog_convert_config">The config file doesn\'t compatible with V2ray for Android, click \"OK\" to convert.</string>
+    <string name="toast_config_file_invalid">Config file invalid.</string>
 </resources>

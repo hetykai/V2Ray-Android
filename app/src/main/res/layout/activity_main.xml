@@ -8,25 +8,30 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
 
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.rayfatasy.v2ray.ui.MainActivity$MainFragment"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_config_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </ScrollView>
 
     <com.github.jorgecastilloprz.FABProgressCircle
         android:id="@+id/fabProgressCircle"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_gravity="bottom|left"
+        android:layout_gravity="bottom|end"
         android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         app:arcColor="@color/colorPrimary"
         app:arcWidth="7dp"
-        app:reusable="true"
         app:finalIcon="@drawable/ic_check_24dp"
-        app:layout_anchor="@+id/settingsFragment"
-        app:layout_anchorGravity="bottom|right">
+        app:layout_anchorGravity="bottom|right"
+        app:reusable="true">
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
