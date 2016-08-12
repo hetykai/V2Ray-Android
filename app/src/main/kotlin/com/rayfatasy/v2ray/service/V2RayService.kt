@@ -83,8 +83,9 @@ class V2RayService : Service() {
 
         Bus.observe<CheckV2RayStatusEvent>()
                 .subscribe {
-                    val prepare = VpnService.prepare(this)
-                    val isRunning = prepare == null && vpnService != null && v2rayPoint.isRunning
+                    val isRunning = vpnService != null
+                            && v2rayPoint.isRunning
+                            && VpnService.prepare(this) == null
                     it.callback(isRunning)
                 }
 
