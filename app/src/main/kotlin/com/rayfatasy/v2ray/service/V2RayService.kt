@@ -8,9 +8,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.VpnService
-import android.os.Build
 import android.os.IBinder
 import android.os.StrictMode
+import android.support.v7.app.NotificationCompat
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
@@ -147,30 +147,27 @@ class V2RayService : Service() {
         stopSelf()
     }
 
-    @Suppress("DEPRECATION")
     private fun showNotification() {
         val startMainIntent = Intent(applicationContext, MainActivity::class.java)
         val contentPendingIntent = PendingIntent.getActivity(applicationContext,
-                NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val notificationBuilder = Notification.Builder(applicationContext)
+        val stopV2RayIntent = Intent(ACTION_STOP_V2RAY)
+        val stopV2RayPendingIntent = PendingIntent.getBroadcast(applicationContext,
+                NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val notification = NotificationCompat.Builder(applicationContext)
                 .setSmallIcon(R.drawable.ic_action_logo)
                 .setContentTitle(getString(R.string.notification_content_title))
                 .setContentText(getString(R.string.notification_content_text))
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setContentIntent(contentPendingIntent)
-
-        val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            val stopV2RayIntent = Intent(ACTION_STOP_V2RAY)
-            val stopV2RayPendingIntent = PendingIntent.getBroadcast(applicationContext,
-                    NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            notificationBuilder
-                    .addAction(R.drawable.ic_close_grey_800_24dp,
-                            getString(R.string.notification_action_stop_v2ray),
-                            stopV2RayPendingIntent)
-                    .build()
-        } else {
-            notificationBuilder.notification
-        }
+                .addAction(R.drawable.ic_close_grey_800_24dp,
+                        getString(R.string.notification_action_stop_v2ray),
+                        stopV2RayPendingIntent)
+                .build()
 
         notification.flags = notification.flags or Notification.FLAG_ONGOING_EVENT
 
