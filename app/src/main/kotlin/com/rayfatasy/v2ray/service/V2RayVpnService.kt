@@ -6,7 +6,7 @@ import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
-import com.rayfatasy.v2ray.event.StopV2RayEvent
+import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnServiceSendSelfEvent
 import com.rayfatasy.v2ray.event.VpnServiceStatusEvent
 import com.rayfatasy.v2ray.getV2RayApplication
@@ -19,7 +19,8 @@ class V2RayVpnService : VpnService() {
 
     override fun onCreate() {
         super.onCreate()
-        Bus.observe<StopV2RayEvent>()
+        Bus.observe<V2RayStatusEvent>()
+                .filter { !it.isRunning }
                 .subscribe { stopSelf() }
                 .registerInBus(this)
     }
