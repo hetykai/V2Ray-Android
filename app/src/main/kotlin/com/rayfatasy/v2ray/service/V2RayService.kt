@@ -29,6 +29,9 @@ class V2RayService : Service() {
         const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 0
         const val ACTION_STOP_V2RAY = "com.rayfatasy.v2ray.action.STOP_V2RAY"
 
+        var isServiceRunning = false
+            private set
+
         fun startV2Ray(context: Context) {
             context.startService<V2RayService>()
         }
@@ -38,6 +41,10 @@ class V2RayService : Service() {
         }
 
         fun checkStatusEvent(callback: (Boolean) -> Unit) {
+            if (!isServiceRunning) {
+                callback(false)
+                return
+            }
             Bus.send(CheckV2RayStatusEvent(callback))
         }
     }
@@ -57,6 +64,8 @@ class V2RayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
+        isServiceRunning = true
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
@@ -96,6 +105,7 @@ class V2RayService : Service() {
         super.onDestroy()
         Bus.unregister(this)
         unregisterReceiver(stopV2RayReceiver)
+        isServiceRunning = false
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
