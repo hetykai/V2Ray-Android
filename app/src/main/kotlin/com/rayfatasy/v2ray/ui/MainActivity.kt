@@ -2,16 +2,15 @@ package com.rayfatasy.v2ray.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
-import com.github.jorgecastilloprz.listeners.FABProgressListener
 import com.rayfatasy.v2ray.R
+import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.service.V2RayService
@@ -24,15 +23,21 @@ import org.jetbrains.anko.toast
 class MainActivity : AppCompatActivity() {
 
 
-
-
     companion object {
         private const val REQUEST_CODE_VPN_PREPARE = 0
 
         private const val REQUEST_CODE_FILE_SELECT = 1
     }
 
-    var isServiceActive: Boolean = false
+    var fabChecked = false
+        set(value) {
+            field = value
+            if (value) {
+                fab.setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_check_24dp, null), false)
+            } else {
+                fab.setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_logo, null), false)
+            }
+        }
 
     private lateinit var vpnPrepareCallback: (Boolean) -> Unit
 
@@ -40,45 +45,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        tv_config_content.text = getV2RayApplication().configFile.readText()
+
+        fab.setOnClickListener {
+            if (fabChecked) {
+                V2RayService.stopV2Ray()
+            } else {
+                V2RayService.startV2Ray(ctx)
+            }
+        }
+
         Bus.observe<VpnPrepareEvent>()
                 .subscribe {
                     vpnPrepareCallback = it.callback
                     startActivityForResult(it.intent, REQUEST_CODE_VPN_PREPARE)
                 }
                 .registerInBus(this)
-        tv_config_content.text = getV2RayApplication().configFile.readText()
 
-
-        fab.setOnClickListener{
-            V2RayService.checkStatusEvent {
-                if (it){
-                    V2RayService.stopV2Ray()
-                    fab.setIcon(resources.getDrawable(R.drawable.ic_action_logo),true)
-                }else{
-                    V2RayService.startV2Ray(ctx)
-                    fab.setIcon(resources.getDrawable(R.drawable.ic_check_24dp),true)
-
+        Bus.observe<V2RayStatusEvent>()
+                .subscribe {
+                    fabChecked = it.isRunning
                 }
-
-            }
-        }
-
-    }
-
-    fun setFabIcon(animation:Boolean){
-        V2RayService.checkStatusEvent {
-            if (it){
-                fab.setIcon(resources.getDrawable(R.drawable.ic_check_24dp),animation)
-            }else{
-                fab.setIcon(resources.getDrawable(R.drawable.ic_action_logo),animation)
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setFabIcon(false)
-
+        V2RayService.checkStatusEvent { fabChecked = it }
     }
 
     override fun onDestroy() {
