@@ -3,6 +3,7 @@ package com.rayfatasy.v2ray.ui
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -20,7 +21,9 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.ctx
 import org.jetbrains.anko.toast
 
-class MainActivity : AppCompatActivity(), FABProgressListener {
+class MainActivity : AppCompatActivity() {
+
+
 
 
     companion object {
@@ -43,39 +46,38 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
                     startActivityForResult(it.intent, REQUEST_CODE_VPN_PREPARE)
                 }
                 .registerInBus(this)
-        fabProgressCircle.attachListener(this)
-        fab.setOnClickListener {
-            if (!isServiceActive) {
-                fabProgressCircle.show()
-                V2RayService.startV2Ray(ctx)
-                isServiceActive = true
-                fabProgressCircle.beginFinalAnimation()
+        tv_config_content.text = getV2RayApplication().configFile.readText()
 
-            } else {
-                fabProgressCircle.show()
-                V2RayService.stopV2Ray()
-                isServiceActive = false
-                fab.setImageResource(R.drawable.ic_action_logo)
-                fabProgressCircle.beginFinalAnimation()
+
+        fab.setOnClickListener{
+            V2RayService.checkStatusEvent {
+                if (it){
+                    V2RayService.stopV2Ray()
+                    fab.setIcon(resources.getDrawable(R.drawable.ic_action_logo),true)
+                }else{
+                    V2RayService.startV2Ray(ctx)
+                    fab.setIcon(resources.getDrawable(R.drawable.ic_check_24dp),true)
+
+                }
+
             }
-
         }
 
-        tv_config_content.text = getV2RayApplication().configFile.readText()
+    }
+
+    fun setFabIcon(animation:Boolean){
+        V2RayService.checkStatusEvent {
+            if (it){
+                fab.setIcon(resources.getDrawable(R.drawable.ic_check_24dp),animation)
+            }else{
+                fab.setIcon(resources.getDrawable(R.drawable.ic_action_logo),animation)
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        V2RayService.checkStatusEvent {
-            if (it) {
-                fab.setBackgroundColor(Color.parseColor("#000000"))
-                fab.setImageResource(R.drawable.ic_check_24dp)
-                isServiceActive = true
-            } else {
-                fab.setImageResource(R.drawable.ic_action_logo)
-                isServiceActive = false
-            }
-        }
+        setFabIcon(false)
 
     }
 
@@ -146,15 +148,5 @@ class MainActivity : AppCompatActivity(), FABProgressListener {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun onFABProgressAnimationEnd() {
-        fab.isClickable = true
-        if (isServiceActive) {
-            fab.setImageResource(R.drawable.ic_check_24dp)
-            toast("连接成功")
-        } else {
-            toast("已停止连接")
-        }
 
-
-    }
 }
