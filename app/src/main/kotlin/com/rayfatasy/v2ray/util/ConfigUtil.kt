@@ -1,7 +1,9 @@
 package com.rayfatasy.v2ray.util
 
+import org.apache.commons.validator.routines.InetAddressValidator
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.*
 
 object ConfigUtil {
     val replacementPairs by lazy {
@@ -44,7 +46,7 @@ object ConfigUtil {
                     "4",
                     "--enable-udprelay"
                     ],
-                    "VPNSetupArg": "m,1500 a,26.26.26.1,24 r,0.0.0.0,0 d,208.67.222.222"
+                    "VPNSetupArg": "m,1500 a,26.26.26.1,24 r,0.0.0.0,0"
                     }
                 }"""),
                 "log" to JSONObject("""{
@@ -68,6 +70,27 @@ object ConfigUtil {
         val jObj = JSONObject(conf)
         jObj.putOpt(replacementPairs)
         return jObj.toString()
+    }
+
+    fun readDnsServersFromConfig(conf: String, vararg defaultDns: String): Array<out String> {
+        val json = JSONObject(conf)
+
+        if (!json.has("dns"))
+            return defaultDns
+        val dns = json.optJSONObject("dns")
+
+        if (!dns.has("servers"))
+            return defaultDns
+        val servers = dns.optJSONArray("servers")
+
+        val ret = LinkedList<String>()
+        for (i in 0..servers.length() - 1) {
+            val e = servers.getString(i)
+            if (InetAddressValidator.getInstance().isValid(e))
+                ret.add(e)
+        }
+
+        return ret.toTypedArray()
     }
 }
 

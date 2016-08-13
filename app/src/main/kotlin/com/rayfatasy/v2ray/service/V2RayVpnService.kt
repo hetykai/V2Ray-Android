@@ -9,6 +9,8 @@ import com.eightbitlab.rxbus.registerInBus
 import com.rayfatasy.v2ray.event.StopV2RayEvent
 import com.rayfatasy.v2ray.event.VpnServiceSendSelfEvent
 import com.rayfatasy.v2ray.event.VpnServiceStatusEvent
+import com.rayfatasy.v2ray.getV2RayApplication
+import com.rayfatasy.v2ray.util.ConfigUtil
 
 class V2RayVpnService : VpnService() {
 
@@ -41,21 +43,23 @@ class V2RayVpnService : VpnService() {
         // If the old interface has exactly the same parameters, use it!
         // Configure a builder while parsing the parameters.
         val builder = Builder()
+
         for (parameter in parameters.split(" ")) {
             val fields = parameter.split(",")
-            try {
-                when (fields[0][0]) {
-                    'm' -> builder.setMtu(java.lang.Short.parseShort(fields[1]).toInt())
-                    'a' -> builder.addAddress(fields[1], Integer.parseInt(fields[2]))
-                    'r' -> builder.addRoute(fields[1], Integer.parseInt(fields[2]))
-                    'd' -> builder.addDnsServer(fields[1])
-                    's' -> builder.addSearchDomain(fields[1])
-                }
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Bad parameter: " + parameter)
+            when (fields[0][0]) {
+                'm' -> builder.setMtu(java.lang.Short.parseShort(fields[1]).toInt())
+                'a' -> builder.addAddress(fields[1], Integer.parseInt(fields[2]))
+                'r' -> builder.addRoute(fields[1], Integer.parseInt(fields[2]))
+                's' -> builder.addSearchDomain(fields[1])
             }
 
         }
+
+        val conf = getV2RayApplication().configFile.readText()
+        val dnsServers = ConfigUtil.readDnsServersFromConfig(conf, "8.8.8.8", "8.8.4.4")
+        for (dns in dnsServers)
+            builder.addDnsServer(dns)
+
         // Close the old interface since the parameters have been changed.
         try {
             mInterface.close()
