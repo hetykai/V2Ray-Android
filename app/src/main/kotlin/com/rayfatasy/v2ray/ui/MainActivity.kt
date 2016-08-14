@@ -5,19 +5,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
+import com.rayfatasy.v2ray.getConfigFilePath
 import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.service.V2RayService
 import com.rayfatasy.v2ray.util.ConfigUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.ctx
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity() {
@@ -41,11 +45,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var vpnPrepareCallback: (Boolean) -> Unit
 
+    private val adapter by lazy { MainRecyclerAdapter(this, getV2RayApplication().configs) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        tv_config_content.text = getV2RayApplication().configFile.readText()
 
         fab.setOnClickListener {
             if (fabChecked) {
@@ -54,6 +58,9 @@ class MainActivity : AppCompatActivity() {
                 V2RayService.startV2Ray(ctx)
             }
         }
+
+        recycler_view.layoutManager = LinearLayoutManager(this)
+        recycler_view.adapter = adapter
 
         Bus.observe<VpnPrepareEvent>()
                 .subscribe {
@@ -85,32 +92,57 @@ class MainActivity : AppCompatActivity() {
                     val uri = data!!.data
                     val rawInputStream = contentResolver.openInputStream(uri)
                     val rawConfig = rawInputStream.bufferedReader().readText()
-                    val retFile = getV2RayApplication().configFile
 
                     if (!ConfigUtil.validConfig(rawConfig)) {
                         toast(R.string.toast_config_file_invalid)
                         return
                     }
 
-                    if (ConfigUtil.isConfigCompatible(rawConfig)) {
-                        retFile.writeText(rawConfig)
-                        tv_config_content.text = rawConfig
-                    } else {
-                        alert(R.string.msg_dialog_convert_config, R.string.title_dialog_convert_config) {
-                            positiveButton(android.R.string.ok) {
-                                val retConfig = ConfigUtil.convertConfig(rawConfig)
-                                retFile.writeText(retConfig)
-                                tv_config_content.text = retConfig
-                            }
+                    alert(R.string.title_dialog_input_config_name) {
+                        val input = EditText(this@MainActivity)
+                        customView(input)
 
-                            negativeButton()
-
-                            show()
+                        positiveButton(android.R.string.ok) {
+                            val name = input.text.toString()
+                            storeConfigFile(rawConfig, name)
                         }
+
+                        negativeButton(android.R.string.cancel)
+
+                        show()
                     }
                 }
             }
         }
+    }
+
+    private fun updateAdapter() {
+        adapter.configs = getV2RayApplication().configs
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun storeConfigFile(rawConfig: String, name: String) {
+        val retFile = getConfigFilePath(name)
+
+        if (ConfigUtil.isConfigCompatible(rawConfig)) {
+            retFile.writeText(rawConfig)
+            defaultSharedPreferences.edit().putString(V2RayService.PREF_CURR_CONFIG, name).apply()
+            updateAdapter()
+        } else {
+            alert(R.string.msg_dialog_convert_config, R.string.title_dialog_convert_config) {
+                positiveButton(android.R.string.ok) {
+                    val retConfig = ConfigUtil.convertConfig(rawConfig)
+                    retFile.writeText(retConfig)
+                    defaultSharedPreferences.edit().putString(V2RayService.PREF_CURR_CONFIG, name).apply()
+                    updateAdapter()
+                }
+
+                negativeButton()
+
+                show()
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

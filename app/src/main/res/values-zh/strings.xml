@@ -19,4 +19,5 @@
     <string name="title_file_chooser">选择文件以导入</string>
     <string name="toast_config_file_invalid">配置文件无效</string>
     <string name="toast_require_file_manager">请安装一个文件管理器</string>
+    <string name="title_dialog_input_config_name">请输入配置名称</string>
 </resources>

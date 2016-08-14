@@ -16,9 +16,10 @@ import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.*
-import com.rayfatasy.v2ray.getV2RayApplication
+import com.rayfatasy.v2ray.getConfigFilePath
 import com.rayfatasy.v2ray.ui.MainActivity
 import go.libv2ray.Libv2ray
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.startService
 
@@ -28,6 +29,7 @@ class V2RayService : Service() {
         const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
         const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 0
         const val ACTION_STOP_V2RAY = "com.rayfatasy.v2ray.action.STOP_V2RAY"
+        const val PREF_CURR_CONFIG = "pref_curr_config"
 
         var isServiceRunning = false
             private set
@@ -143,7 +145,12 @@ class V2RayService : Service() {
         if (!v2rayPoint.isRunning) {
             v2rayPoint.callbacks = v2rayCallback
             v2rayPoint.vpnSupportSet = v2rayCallback
-            v2rayPoint.configureFile = getV2RayApplication().configFile.absolutePath
+            val configName = defaultSharedPreferences.getString(PREF_CURR_CONFIG, "")
+            if (configName == "") {
+                stopV2Ray()
+                return
+            }
+            v2rayPoint.configureFile = getConfigFilePath(configName).absolutePath
             v2rayPoint.RunLoop()
         }
     }
