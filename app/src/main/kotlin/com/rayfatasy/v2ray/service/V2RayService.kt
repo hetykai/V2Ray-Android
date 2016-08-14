@@ -19,9 +19,9 @@ import com.rayfatasy.v2ray.event.*
 import com.rayfatasy.v2ray.getConfigFilePath
 import com.rayfatasy.v2ray.ui.MainActivity
 import go.libv2ray.Libv2ray
-import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.startService
+import java.io.File
 
 class V2RayService : Service() {
     companion object {
@@ -145,12 +145,7 @@ class V2RayService : Service() {
         if (!v2rayPoint.isRunning) {
             v2rayPoint.callbacks = v2rayCallback
             v2rayPoint.vpnSupportSet = v2rayCallback
-            val configName = defaultSharedPreferences.getString(PREF_CURR_CONFIG, "")
-            if (configName == "") {
-                stopV2Ray()
-                return
-            }
-            v2rayPoint.configureFile = getConfigFilePath(configName).absolutePath
+            v2rayPoint.configureFile = getConfigFilePath().absolutePath
             v2rayPoint.RunLoop()
         }
     }
@@ -176,10 +171,12 @@ class V2RayService : Service() {
                 NOTIFICATION_PENDING_INTENT_STOP_V2RAY, stopV2RayIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
+        val configName = File(v2rayPoint.configureFile).name
+
         val notification = NotificationCompat.Builder(applicationContext)
                 .setSmallIcon(R.drawable.ic_action_logo)
                 .setContentTitle(getString(R.string.notification_content_title))
-                .setContentText(getString(R.string.notification_content_text))
+                .setContentText(getString(R.string.notification_content_text, configName))
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setContentIntent(contentPendingIntent)
                 .addAction(R.drawable.ic_close_grey_800_24dp,
