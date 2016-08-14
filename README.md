@@ -2,7 +2,7 @@
 # V2Ray for Android
 
 * If you don't know what is V2Ray, please see to [V2Ray official website](http://www.v2ray.com).
-* This is an unofficial V2Ray client for Android, using [V2Ray official core](https://github.com/v2ray/v2ray-core).
+* This is a third-party V2Ray client for Android, using [V2Ray official core](https://github.com/v2ray/v2ray-core).
 
 ## How to Use
 
@@ -17,7 +17,7 @@
 1. `git clone https://github.com/RayFantasyStudio/V2Ray-Android.git`
 2. Open in Android Studio or Intellij IDEA.
 
-Module "libv2ray" is build from [AndroidLibV2ray](https://github.com/xiaokangwang/AndroidLibV2ray) which is developed by @xiaokangwang.
+Module "libv2ray" is build from [AndroidLibV2ray](https://github.com/xiaokangwang/AndroidLibV2ray) which is developed by [@xiaokangwang](https://github.com/xiaokangwang).
 
 ## License
 ```
