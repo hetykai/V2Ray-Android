@@ -14,7 +14,7 @@ import com.eightbitlab.rxbus.registerInBus
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
-import com.rayfatasy.v2ray.getConfigFilePath
+import com.rayfatasy.v2ray.getConfigFile
 import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.service.V2RayService
 import com.rayfatasy.v2ray.util.ConfigUtil
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun storeConfigFile(rawConfig: String, name: String) {
-        val retFile = getConfigFilePath(name)
+        val retFile = getConfigFile(name)
 
         if (ConfigUtil.isConfigCompatible(rawConfig)) {
             retFile.writeText(rawConfig)

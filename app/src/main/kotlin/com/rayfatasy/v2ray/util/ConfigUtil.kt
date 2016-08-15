@@ -1,5 +1,7 @@
 package com.rayfatasy.v2ray.util
 
+import android.content.Context
+import com.rayfatasy.v2ray.getConfigFile
 import org.apache.commons.validator.routines.InetAddressValidator
 import org.json.JSONException
 import org.json.JSONObject
@@ -93,6 +95,37 @@ object ConfigUtil {
         }
 
         return ret.toTypedArray()
+    }
+
+    fun readAddressFromConfig(conf: String): String? {
+        val json = JSONObject(conf)
+
+        if (!json.has("outbound"))
+            return null
+        val outbound = json.optJSONObject("outbound")
+
+        if (!outbound.has("settings"))
+            return null
+        val settings = outbound.optJSONObject("settings")
+
+        if (!settings.has("vnext"))
+            return null
+        val vnext = settings.optJSONArray("vnext")
+
+        if (vnext.length() < 1)
+            return null
+        val vpoint = vnext.optJSONObject(0)
+
+        if (!vpoint.has("address"))
+            return null
+        val address = vpoint.optString("address")
+
+        return address
+    }
+
+    fun readAddressByName(ctx: Context, name: String): String? {
+        val conf = ctx.getConfigFile(name).readText()
+        return readAddressFromConfig(conf)
     }
 }
 

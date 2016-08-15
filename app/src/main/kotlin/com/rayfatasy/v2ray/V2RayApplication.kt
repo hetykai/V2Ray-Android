@@ -27,6 +27,6 @@ class V2RayApplication : Application() {
 }
 
 fun Context.getV2RayApplication() = this.applicationContext as V2RayApplication
-fun Context.getConfigFilePath(name: String) = File(getV2RayApplication().configFileDir, name)
-fun Context.getConfigFilePath() = File(getV2RayApplication().configFileDir,
+fun Context.getConfigFile(name: String) = File(getV2RayApplication().configFileDir, name)
+fun Context.getConfigFile() = File(getV2RayApplication().configFileDir,
         defaultSharedPreferences.getString(V2RayService.PREF_CURR_CONFIG, ""))

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.service.V2RayService
+import com.rayfatasy.v2ray.util.ConfigUtil
 import kotlinx.android.synthetic.main.item_recycler_main.view.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.layoutInflater
@@ -19,6 +20,7 @@ class MainRecyclerAdapter(ctx: Context, var configs: Array<String>) : RecyclerVi
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         val conf = configs[position]
         holder.name.text = conf
+        holder.address.text = ConfigUtil.readAddressByName(holder.address.context, conf)
         holder.radio.isChecked = conf == preference.getString(V2RayService.PREF_CURR_CONFIG, "")
         holder.radio.onClick {
             preference.edit().putString(V2RayService.PREF_CURR_CONFIG, conf).apply()
@@ -34,5 +36,6 @@ class MainRecyclerAdapter(ctx: Context, var configs: Array<String>) : RecyclerVi
     class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val radio = itemView.btn_radio!!
         val name = itemView.tv_name!!
+        val address = itemView.tv_address!!
     }
 }

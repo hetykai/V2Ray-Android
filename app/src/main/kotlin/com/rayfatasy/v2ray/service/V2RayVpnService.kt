@@ -9,7 +9,7 @@ import com.eightbitlab.rxbus.registerInBus
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnServiceSendSelfEvent
 import com.rayfatasy.v2ray.event.VpnServiceStatusEvent
-import com.rayfatasy.v2ray.getConfigFilePath
+import com.rayfatasy.v2ray.getConfigFile
 import com.rayfatasy.v2ray.util.ConfigUtil
 
 class V2RayVpnService : VpnService() {
@@ -56,7 +56,7 @@ class V2RayVpnService : VpnService() {
 
         }
 
-        val conf = getConfigFilePath().readText()
+        val conf = getConfigFile().readText()
         val dnsServers = ConfigUtil.readDnsServersFromConfig(conf, "8.8.8.8", "8.8.4.4")
         for (dns in dnsServers)
             builder.addDnsServer(dns)

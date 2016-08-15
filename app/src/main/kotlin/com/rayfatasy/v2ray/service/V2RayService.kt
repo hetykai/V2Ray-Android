@@ -16,7 +16,7 @@ import com.eightbitlab.rxbus.registerInBus
 import com.orhanobut.logger.Logger
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.*
-import com.rayfatasy.v2ray.getConfigFilePath
+import com.rayfatasy.v2ray.getConfigFile
 import com.rayfatasy.v2ray.ui.MainActivity
 import go.libv2ray.Libv2ray
 import org.jetbrains.anko.notificationManager
@@ -145,7 +145,7 @@ class V2RayService : Service() {
         if (!v2rayPoint.isRunning) {
             v2rayPoint.callbacks = v2rayCallback
             v2rayPoint.vpnSupportSet = v2rayCallback
-            v2rayPoint.configureFile = getConfigFilePath().absolutePath
+            v2rayPoint.configureFile = getConfigFile().absolutePath
             v2rayPoint.RunLoop()
         }
     }
