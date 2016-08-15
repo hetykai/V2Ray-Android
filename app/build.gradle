@@ -58,6 +58,8 @@ dependencies {
         exclude group: 'commons-beanutils'
     }
 
+    compile 'com.google.code.gson:gson:2.7'
+
 }
 
 buildscript {

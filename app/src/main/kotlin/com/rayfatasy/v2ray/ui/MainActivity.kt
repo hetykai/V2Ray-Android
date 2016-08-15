@@ -125,14 +125,16 @@ class MainActivity : AppCompatActivity() {
         val retFile = getConfigFile(name)
 
         if (ConfigUtil.isConfigCompatible(rawConfig)) {
-            retFile.writeText(rawConfig)
+            val formatted = ConfigUtil.formatJSON(rawConfig)
+            retFile.writeText(formatted)
             defaultSharedPreferences.edit().putString(V2RayService.PREF_CURR_CONFIG, name).apply()
             updateAdapter()
         } else {
             alert(R.string.msg_dialog_convert_config, R.string.title_dialog_convert_config) {
                 positiveButton(android.R.string.ok) {
                     val retConfig = ConfigUtil.convertConfig(rawConfig)
-                    retFile.writeText(retConfig)
+                    val formatted = ConfigUtil.formatJSON(retConfig)
+                    retFile.writeText(formatted)
                     defaultSharedPreferences.edit().putString(V2RayService.PREF_CURR_CONFIG, name).apply()
                     updateAdapter()
                 }

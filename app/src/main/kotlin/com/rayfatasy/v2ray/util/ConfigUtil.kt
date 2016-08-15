@@ -1,6 +1,8 @@
 package com.rayfatasy.v2ray.util
 
 import android.content.Context
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
 import com.rayfatasy.v2ray.getConfigFile
 import org.apache.commons.validator.routines.InetAddressValidator
 import org.json.JSONException
@@ -126,6 +128,14 @@ object ConfigUtil {
     fun readAddressByName(ctx: Context, name: String): String? {
         val conf = ctx.getConfigFile(name).readText()
         return readAddressFromConfig(conf)
+    }
+
+    fun formatJSON(src: String): String {
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val jp = JsonParser()
+        val je = jp.parse(src)
+        val prettyJsonString = gson.toJson(je)
+        return prettyJsonString
     }
 }
 
