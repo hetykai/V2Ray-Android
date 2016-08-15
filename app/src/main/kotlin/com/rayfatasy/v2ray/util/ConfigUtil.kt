@@ -88,6 +88,8 @@ object ConfigUtil {
             val e = servers.getString(i)
             if (InetAddressValidator.getInstance().isValid(e))
                 ret.add(e)
+            else if (e == "localhost")
+                NetworkUtil.getDnsServers()?.let { ret.addAll(it) }
         }
 
         return ret.toTypedArray()
