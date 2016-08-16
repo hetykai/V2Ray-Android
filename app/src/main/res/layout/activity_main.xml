@@ -7,6 +7,11 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
+    <CheckBox
+        android:layout_width="match_parent"
+        android:text="开机启动"
+        android:id="@+id/cb_startonboot"
+        android:layout_height="wrap_content" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"

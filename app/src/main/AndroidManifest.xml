@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
 
     <application
         android:name=".V2RayApplication"
@@ -33,6 +35,15 @@
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.BIND_VPN_SERVICE" />
+
+
+        <receiver android:name=".util.BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
