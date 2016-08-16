@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.CompoundButton
 import android.widget.EditText
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
@@ -19,10 +20,7 @@ import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.service.V2RayService
 import com.rayfatasy.v2ray.util.ConfigUtil
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.ctx
-import org.jetbrains.anko.defaultSharedPreferences
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         private const val REQUEST_CODE_FILE_SELECT = 1
     }
+
 
     var fabChecked = false
         set(value) {
@@ -74,6 +73,16 @@ class MainActivity : AppCompatActivity() {
                     fabChecked = it.isRunning
                 }
         V2RayService.checkStatusEvent { fabChecked = it }
+
+
+        cb_startonboot.isChecked = defaultSharedPreferences.getBoolean("StartOnBoot",false)
+        cb_startonboot.setOnCheckedChangeListener{
+            buttonView, isChecked ->
+            defaultSharedPreferences.edit().putBoolean("StartOnBoot",isChecked).apply()
+        }
+
+
+
     }
 
     override fun onDestroy() {
@@ -169,6 +178,8 @@ class MainActivity : AppCompatActivity() {
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+
 
 
 }
