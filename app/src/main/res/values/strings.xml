@@ -21,4 +21,5 @@
     <string name="msg_dialog_convert_config">The config file doesn\'t compatible with V2ray for Android, click \"OK\" to convert.</string>
     <string name="toast_config_file_invalid">Config file invalid.</string>
     <string name="title_dialog_input_config_name">Please Input Config Name</string>
+    <string name="main_ad_unit_id">ca-app-pub-2250118750843932/1169751601</string>
 </resources>

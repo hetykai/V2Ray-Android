@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.widget.EditText
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
+import com.google.android.gms.ads.AdRequest
 import com.rayfatasy.v2ray.R
 import com.rayfatasy.v2ray.event.V2RayStatusEvent
 import com.rayfatasy.v2ray.event.VpnPrepareEvent
@@ -74,6 +75,11 @@ class MainActivity : AppCompatActivity() {
                     fabChecked = it.isRunning
                 }
         V2RayService.checkStatusEvent { fabChecked = it }
+
+        val adRequest = AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build()
+        adView.loadAd(adRequest)
     }
 
     override fun onDestroy() {

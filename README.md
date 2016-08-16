@@ -15,7 +15,8 @@
 ## Build
 
 1. `git clone https://github.com/RayFantasyStudio/V2Ray-Android.git`
-2. Open in Android Studio or Intellij IDEA.
+2. Create a Firebase app, and download the `google-service.json` to `<PROJECT_ROOT>/app`
+3. Open in Android Studio or Intellij IDEA.
 
 Module "libv2ray" is build from [AndroidLibV2ray](https://github.com/xiaokangwang/AndroidLibV2ray) which is developed by [@xiaokangwang](https://github.com/xiaokangwang).
 

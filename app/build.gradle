@@ -60,6 +60,9 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.7'
 
+    // Firebase
+    compile 'com.google.firebase:firebase-ads:9.4.0'
+
 }
 
 buildscript {
@@ -70,3 +73,5 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
