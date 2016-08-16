@@ -19,6 +19,7 @@ import com.rayfatasy.v2ray.event.VpnPrepareEvent
 import com.rayfatasy.v2ray.getConfigFile
 import com.rayfatasy.v2ray.getV2RayApplication
 import com.rayfatasy.v2ray.service.V2RayService
+import com.rayfatasy.v2ray.util.AssetsUtil
 import com.rayfatasy.v2ray.util.ConfigUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.*
@@ -86,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                 .build()
         adView.loadAd(adRequest)
 
+        AssetsUtil.verifyStoragePermissions(this);
     }
 
     override fun onDestroy() {
